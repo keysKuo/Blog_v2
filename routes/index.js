@@ -60,7 +60,7 @@ Blogs.find({}, (err, blogs) => {
 router.get('/', (req, res, next) => {
 	Blogs.find({})
 		.then((blogs) => {
-			console.log(blogs);
+			
 			if (blogs.length == 0) {
 				return res.json({ success: false, msg: 'Chưa có blog' });
 			}
@@ -74,7 +74,8 @@ router.get('/', (req, res, next) => {
 					type: blog.type,
 					image: blog.image,
 					createdAt: normalizeDate(blog.createdAt),
-					slug: blog.slug
+					slug: blog.slug,
+					num_likes: blog.likers.length
 				}
 			})
 
@@ -86,17 +87,19 @@ router.get('/', (req, res, next) => {
 			}
 
 			var randomBlogger = data[Math.round(Math.random() * (len - 1))].author;
-			console.log(randomBlogger);
 			var current_user = req.session.user;
+			console.log(randomBlogger.authorSlug);
 			return res.render('index', {
+				googleId: (current_user && current_user.googleId) ? current_user.googleId : '',
 				layouts: true,
 				sidebars: false,
 				slides: slides,
+				signed: current_user ? true : false,
 				slug: current_user ? current_user.slug : '',
 				status: current_user ? 'Đăng Xuất' : 'Đăng Nhập',
 				username: current_user ? current_user.username : 'Người lạ',
 				bloggerName: randomBlogger.username,
-				bloggerSlug: randomBlogger.slug,
+				bloggerSlug: randomBlogger.authorSlug,
 				avatar: randomBlogger.avatar,
 				main_color: current_user ? current_user.main_color : 'black',
 				concept: 'World Seed',
